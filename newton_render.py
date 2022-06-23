@@ -1,12 +1,8 @@
-import sys, pygame, random, math
-pygame.init()
+from hashlib import new
+import sys, random, math
 
-size = width, height = 1920, 1080
-speed = [2, 2]
-# black = 0, 0, 0
-# red = 255, 0, 0
-# green = 0, 225, 0
-# blue = 0, 0, 255
+size = width, height = 1920*4, 1080*4
+
 
 def random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) 
@@ -18,10 +14,7 @@ max_itr = 50
 # colors = [random_color() for x in range(0, color_divisons)]
 
 # BLACK AND WHITE
-colors = [(x*255)/20 for x in range(0, 20)]
-
-# ball = pygame.image.load("intro_ball.gif")
-# ballrect = ball.get_rect()
+colors = [(x*255)/max_itr for x in range(0, max_itr+1)]
 
 
 # Each vector is a column vector
@@ -45,61 +38,56 @@ r = reader('out.txt')
 arr = []
 temp_arr = []
 
+tmp_number_str = ""
+
 for c in r:
-    # c = next(r)    
-    # print(c)
-    if(c == '\''):
+    if(c == '\'' or c == '(' or c == ' ' or c == '#'):
+        if tmp_number_str:
+            temp_arr.append(int(tmp_number_str))
+        tmp_number_str = ""
         continue
 
-    if(c == ' '):
-        continue
-
-    if(c == '('):
-        continue
-
-    if(c == ')'):
+    elif(c == ')'):
+        if tmp_number_str:
+            temp_arr.append(int(tmp_number_str))
+        tmp_number_str = ""
         arr.append(temp_arr.copy())
         temp_arr.clear()
         continue
     
-    if(c == '#'):
-        continue
-    
-    if(c == 'f'):
+    elif(c == 'f'):
         temp_arr.append(-1)
         continue
 
-    temp_arr.append(int(c))
+    tmp_number_str = tmp_number_str + str(c)
 
     
-# print(arr)
+
+# Delete empty lists
+arr = [ele for ele in arr if ele != []]
 
 
-screen = pygame.display.set_mode(size)
 
+
+def colorIterations(arr):
+    new_arr = []
+    for i in range(0, len(arr)):
+        tmp = []
+        for j in range(0, len(arr[i])):
+            if(arr[i][j] == -1):
+                tmp.extend([0, 0, 0])
+            else:                
+                tmp.extend([int(colors[arr[i][j]]), int(colors[arr[i][j]]), int(colors[arr[i][j]])])
+        new_arr.append(tuple(tmp))
+    return new_arr
+
+
+rgb_pixels = colorIterations(arr)
 
 painted = False
+import png
 
-while True:
-    for event in pygame.event.get():
-        if event.type == pygame.QUIT: sys.exit()
-
-    if not painted:
-        for i in range(0, width):
-            for j in range(0, height):
-                itr = arr[i][j]
-                if(itr == -1):
-                    color = (0, 0, 0)
-                else:
-                    # COLOR MODE
-                    # color = (colors[math.floor(itr % color_divisons)])
-
-                    # B&W
-                    color = (colors[itr], colors[itr], colors[itr])
-                pygame.draw.rect(screen, color, pygame.Rect(i,j,1,1))
-    painted = True
-    
-    # screen.fill(black)
-    # screen.blit(ball, ballrect)
-    pygame.display.flip()
-    pygame.time.wait(100)
+f = open('out.png', 'wb')
+w = png.Writer(width, height, greyscale=False)
+w.write(f, rgb_pixels)
+f.close()

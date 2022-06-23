@@ -2,8 +2,9 @@
 
 (define TOLERANCE 0.000001)
 
-(define RESOLUTION-X 1920)
-(define RESOLUTION-Y 1080)
+; Resolutions are inverted, (RES-Y, RES-X)
+(define RESOLUTION-X 4320)
+(define RESOLUTION-Y 7680)
 
 (define XMIN -2)
 (define XMAX 2)
@@ -15,14 +16,9 @@
 (define FUNCTION (lambda (x) (exact->inexact(- (expt x 3) 1))))
 (define DERIV (lambda (x) (exact->inexact(* 3 (expt x 2)))))
 (define ROOTS '(1+0i -0.5+0.866025403i -0.5-0.866025403i))
-(define MAX-ITR 30)
+(define MAX-ITR 50)
 
 ; Generate an nxm vector of 0s
-; This will make a bunch of aliases, (i.e) each subvector will be a clone of each other, and what affects one will affect all
-; (define (gen-2d-vector n m)
-;     (make-vector n (make-vector m 0))
-; )
-
 (define (gen-matrix m n)
     (build-vector m
         (lambda (row)
@@ -32,15 +28,14 @@
 )
 
 
-; (define (deriv f x) 
-;     (/ (- (f (+ x 0.000001)) (f x)) 0.000001)
-; )
 
 ; Find the incremenet step for a line of length max - min with d subdivisions
 (define (find-step min-val max-val d)
-    ( / (- max-val min-val) (- d 1))
+    (exact->inexact( / (- max-val min-val) (- d 1)))
 )
 
+; Return the roots mapped with themselves, if z is within threshold
+; Returns false otherwise
 (define (within-threshold-to-roots z roots) 
     (map 
         (lambda (x)
@@ -56,8 +51,7 @@
 )
 
 
-; Set an nxm vector to complex numbers w/ scaling factor
-; i.e -2 to 2 w/ 10 elements is a step of 4/10
+; Set an nxm matrix to a complex plane
 (define (make-complex-plane vec x y xstep ystep)
 
         (for ([i (in-range 0 (vector-length vec))])
@@ -105,26 +99,10 @@
 
 
 (define vector (gen-matrix RESOLUTION-X RESOLUTION-Y))
-; (display vector)
-(newline)
-
-; (vector-set! (vector-ref vector 0) 2 55)
 
 (make-complex-plane vector XMIN YMIN (find-step XMIN XMAX RESOLUTION-X) (find-step YMIN YMAX RESOLUTION-Y))
-; (display vector)
-(newline)
-(newline)
-; (display
-;     (vector-map (lambda (col) (vector-map (lambda (x) (newtons-method-paint-by-iteration FUNCTION x ROOTS MAX-ITR 0)) col)) vector)
-; )
-(newline)
-(newline)
 
 (write-to-file 
     (vector-map (lambda (col) (vector-map (lambda (x) (newtons-method-paint-by-iteration FUNCTION DERIV x ROOTS MAX-ITR 0)) col)) vector)
     "out.txt" #:exists 'replace
 )
-    ; (vector-map (vector-map (lambda (x) (newtons-method-paint-by-iteration FUNCTION x ROOTS MAX-ITR 0)) x) vector)
-; 
-; (display (make-complex-plane vector XMIN YMIN (find-step XMIN XMAX RESOLUTION-X) (find-step YMIN YMAX RESOLUTION-YXMAX
-; Take a list and set every element to be
