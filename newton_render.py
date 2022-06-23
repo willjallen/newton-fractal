@@ -8,18 +8,19 @@ size = width, height = 1920*4, 1080*4
 def random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) 
 
-max_itr = 50
+max_itr = 30
 
 # COLOR MODE
 # color_divisons = 50
 # colors = [random_color() for x in range(0, color_divisons)]
 
 # BLACK AND WHITE
-colors = [(x*255)/max_itr for x in range(0, max_itr+1)]
+colors = [(x/max_itr)*255 for x in range(0, max_itr+1)]
+# WHITE AND BLACK
+# colors = [(1-(x/max_itr))*255 for x in range(0, max_itr+1)]
 
 
 # Each vector is a column vector
-
 def reader(filename):
     with open(filename) as f:
         while True:
@@ -33,13 +34,15 @@ def reader(filename):
                 return
                 
 
-r = reader('out.txt')
+r = reader('renders/[z^3-1]-4k-30itr.txt')
 
 
 arr = []
 temp_arr = []
 
 tmp_number_str = ""
+
+print("Reading file")
 
 for c in r:
     if(c == '\'' or c == '(' or c == ' ' or c == '#'):
@@ -82,13 +85,14 @@ def colorIterations(arr):
         new_arr.append(tuple(tmp))
     return new_arr
 
-
+print("Coloring..")
 rgb_pixels = colorIterations(arr)
 
 painted = False
 
-
+print("Writing")
 f = open('out.png', 'wb')
 w = png.Writer(width, height, greyscale=False)
 w.write(f, rgb_pixels)
 f.close()
+print("Finished")

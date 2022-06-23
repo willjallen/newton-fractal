@@ -16,7 +16,7 @@
 (define FUNCTION (lambda (x) (exact->inexact(- (expt x 3) 1))))
 (define DERIV (lambda (x) (exact->inexact(* 3 (expt x 2)))))
 (define ROOTS '(1+0i -0.5+0.866025403i -0.5-0.866025403i))
-(define MAX-ITR 50)
+(define MAX-ITR 30)
 
 ; Generate an nxm vector of 0s
 (define (gen-matrix m n)
