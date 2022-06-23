@@ -2,9 +2,11 @@
 
 (define TOLERANCE 0.000001)
 
+; 4k is 4320 x 7680
+; 16k is 8640 x 15360 
 ; Resolutions are inverted, (RES-Y, RES-X)
-(define RESOLUTION-X 4320)
-(define RESOLUTION-Y 7680)
+(define RESOLUTION-X 8640)
+(define RESOLUTION-Y 15360)
 
 (define XMIN -2)
 (define XMAX 2)
@@ -16,7 +18,7 @@
 (define FUNCTION (lambda (x) (exact->inexact(- (expt x 3) 1))))
 (define DERIV (lambda (x) (exact->inexact(* 3 (expt x 2)))))
 (define ROOTS '(1+0i -0.5+0.866025403i -0.5-0.866025403i))
-(define MAX-ITR 30)
+(define MAX-ITR 100)
 
 ; Generate an nxm vector of 0s
 (define (gen-matrix m n)
@@ -97,12 +99,19 @@
 
 
 
-
+(display "Generating matrix")
+(newline)
 (define vector (gen-matrix RESOLUTION-X RESOLUTION-Y))
 
+(display "Generating complex plane")
+(newline)
 (make-complex-plane vector XMIN YMIN (find-step XMIN XMAX RESOLUTION-X) (find-step YMIN YMAX RESOLUTION-Y))
 
+(display "Generating newton fractal (may take a long time)")
+(newline)
 (write-to-file 
     (vector-map (lambda (col) (vector-map (lambda (x) (newtons-method-paint-by-iteration FUNCTION DERIV x ROOTS MAX-ITR 0)) col)) vector)
     "out.txt" #:exists 'replace
 )
+
+(display "Finished")

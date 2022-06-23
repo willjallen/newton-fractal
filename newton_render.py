@@ -2,22 +2,31 @@ from hashlib import new
 import sys, random, math
 import png
 
-size = width, height = 1920*4, 1080*4
+size = width, height = 15360, 8640
 
 
 def random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) 
 
-max_itr = 30
+max_itr = 100
+
+COLOR_MODE = True
+BLACK_ON_WHITE = False
+WHITE_ON_BLACK = False
+
+colors = []
 
 # COLOR MODE
-# color_divisons = 50
-# colors = [random_color() for x in range(0, color_divisons)]
+COLOR_DIVISIONS = 30
+if COLOR_MODE:
+    colors = [random_color() for x in range(0, COLOR_DIVISIONS)]
 
 # BLACK AND WHITE
-colors = [(x/max_itr)*255 for x in range(0, max_itr+1)]
+if BLACK_ON_WHITE:
+    colors = [(x/max_itr)*255 for x in range(0, max_itr+1)]
 # WHITE AND BLACK
-# colors = [(1-(x/max_itr))*255 for x in range(0, max_itr+1)]
+if WHITE_ON_BLACK:
+    colors = [(1-(x/max_itr))*255 for x in range(0, max_itr+1)]
 
 
 # Each vector is a column vector
@@ -34,7 +43,7 @@ def reader(filename):
                 return
                 
 
-r = reader('renders/[z^3-1]-4k-30itr.txt')
+r = reader('renders/[z^3-1]-16k-100itr.txt')
 
 
 arr = []
@@ -78,10 +87,14 @@ def colorIterations(arr):
     for i in range(0, len(arr)):
         tmp = []
         for j in range(0, len(arr[i])):
-            if(arr[i][j] == -1):
+            itr = arr[i][j]
+            if(itr == -1):
                 tmp.extend([0, 0, 0])
             else:                
-                tmp.extend([int(colors[arr[i][j]]), int(colors[arr[i][j]]), int(colors[arr[i][j]])])
+                if COLOR_MODE:
+                    tmp.extend(colors[itr % COLOR_DIVISIONS])
+                else:
+                    tmp.extend([int(colors[itr]), int(colors[itr]), int(colors[itr])])
         new_arr.append(tuple(tmp))
     return new_arr
 
