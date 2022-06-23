@@ -1,5 +1,6 @@
 from hashlib import new
 import sys, random, math
+import png
 
 size = width, height = 1920*4, 1080*4
 
@@ -85,7 +86,7 @@ def colorIterations(arr):
 rgb_pixels = colorIterations(arr)
 
 painted = False
-import png
+
 
 f = open('out.png', 'wb')
 w = png.Writer(width, height, greyscale=False)
