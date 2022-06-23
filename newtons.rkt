@@ -2,19 +2,19 @@
 
 (define TOLERANCE 0.000001)
 
-(define RESOLUTION-X 1920)
-(define RESOLUTION-Y 1080)
+(define RESOLUTION-X 480)
+(define RESOLUTION-Y 480)
 
-(define XMIN -2)
-(define XMAX 2)
+(define XMIN -2.5)
+(define XMAX 1)
 (define YMIN -2)
-(define YMAX 2)
+(define YMAX 1)
 
 (define colors '((255 0 0) (0 255 0) (0 0 255)))
 
 (define FUNCTION (lambda (x) (- (expt x 3) 1)))
 (define ROOTS '(1+0i -0.5+0.866025403i -0.5-0.866025403i))
-(define MAX-ITR 20)
+(define MAX-ITR 50)
 
 ; Generate an nxm vector of 0s
 ; This will make a bunch of aliases, (i.e) each subvector will be a clone of each other, and what affects one will affect all
@@ -32,7 +32,7 @@
 
 
 (define (deriv f x) 
-    (/ (- (f (+ x 0.000001)) (f x)) 0.000001)
+    (/ (- (f (+ x 0.001)) (f x)) 0.001)
 )
 
 ; Find the incremenet step for a line of length max - min with d subdivisions
