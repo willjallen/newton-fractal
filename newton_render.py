@@ -1,7 +1,7 @@
 import sys, pygame, random, math
 pygame.init()
 
-size = width, height = 480, 480
+size = width, height = 1920, 1080
 speed = [2, 2]
 # black = 0, 0, 0
 # red = 255, 0, 0
@@ -12,9 +12,13 @@ def random_color():
     return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) 
 
 max_itr = 50
-color_divisons = 50
-colors = [random_color() for x in range(0, color_divisons)]
 
+# COLOR MODE
+# color_divisons = 50
+# colors = [random_color() for x in range(0, color_divisons)]
+
+# BLACK AND WHITE
+colors = [(x*255)/20 for x in range(0, 20)]
 
 # ball = pygame.image.load("intro_ball.gif")
 # ballrect = ball.get_rect()
@@ -87,7 +91,11 @@ while True:
                 if(itr == -1):
                     color = (0, 0, 0)
                 else:
-                    color = (colors[math.floor(itr % color_divisons)])
+                    # COLOR MODE
+                    # color = (colors[math.floor(itr % color_divisons)])
+
+                    # B&W
+                    color = (colors[itr], colors[itr], colors[itr])
                 pygame.draw.rect(screen, color, pygame.Rect(i,j,1,1))
     painted = True
     

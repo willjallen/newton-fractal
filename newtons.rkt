@@ -2,19 +2,20 @@
 
 (define TOLERANCE 0.000001)
 
-(define RESOLUTION-X 480)
-(define RESOLUTION-Y 480)
+(define RESOLUTION-X 1920)
+(define RESOLUTION-Y 1080)
 
-(define XMIN -2.5)
-(define XMAX 1)
+(define XMIN -2)
+(define XMAX 2)
 (define YMIN -2)
-(define YMAX 1)
+(define YMAX 2)
 
 (define colors '((255 0 0) (0 255 0) (0 0 255)))
 
-(define FUNCTION (lambda (x) (- (expt x 3) 1)))
+(define FUNCTION (lambda (x) (exact->inexact(- (expt x 3) 1))))
+(define DERIV (lambda (x) (exact->inexact(* 3 (expt x 2)))))
 (define ROOTS '(1+0i -0.5+0.866025403i -0.5-0.866025403i))
-(define MAX-ITR 50)
+(define MAX-ITR 30)
 
 ; Generate an nxm vector of 0s
 ; This will make a bunch of aliases, (i.e) each subvector will be a clone of each other, and what affects one will affect all
@@ -31,9 +32,9 @@
 )
 
 
-(define (deriv f x) 
-    (/ (- (f (+ x 0.001)) (f x)) 0.001)
-)
+; (define (deriv f x) 
+;     (/ (- (f (+ x 0.000001)) (f x)) 0.000001)
+; )
 
 ; Find the incremenet step for a line of length max - min with d subdivisions
 (define (find-step min-val max-val d)
@@ -61,7 +62,7 @@
 
         (for ([i (in-range 0 (vector-length vec))])
             (for ([j (in-range 0 (vector-length (vector-ref vec i)))])
-                    (vector-set! (vector-ref vec i) j (make-rectangular (+ x (* xstep i)) (+ y (* ystep j))))
+                    (vector-set! (vector-ref vec i) j (exact->inexact(make-rectangular (+ x (* xstep i)) (+ y (* ystep j)))))
                     ; (display i) (display ",") (display j) (display "    ") (display (make-rectangular (+ x (* xstep i)) (+ y (* ystep j)))) (newline)
                     ; (display (vector-ref vec 2)) (newline)
             )
@@ -82,27 +83,24 @@
 ; Check for convergence
 ; If convergence, return color modified by iteration count
 ; If we are here, return black
-(define (newtons-method-paint-by-iteration f z roots max-itr itr)
-    (let([thresholds (within-threshold-to-roots z roots)])
-        (let ([filtered-thresholds (filter (lambda (x) (not (boolean? x))) thresholds)])
-            (cond 
-                ((> itr max-itr)
-                    #f
-                )
-        
-                ((not (empty? filtered-thresholds))
-                    ; (get-color-by-itr (first filtered-thresholds) itr max-itr)
-                    itr
-                )
-
-                (else
-                    (newtons-method-paint-by-iteration f (- z (/ (f z) (deriv f z))) roots max-itr (+ itr 1))
-                )
-        
-            )
+(define (newtons-method-paint-by-iteration f df z roots max-itr itr)
+    (cond 
+        ((> itr max-itr)
+            #f
         )
+
+        ((not (empty? (filter (lambda (x) (not (boolean? x))) (within-threshold-to-roots z roots))))
+            itr
+        )
+
+        (else
+            (newtons-method-paint-by-iteration f df (- z (/ (f z) (df z))) roots max-itr (+ itr 1))
+        )
+
     )
+
 )
+
 
 
 
@@ -122,8 +120,10 @@
 (newline)
 (newline)
 
-(with-output-to-file "out.txt"
-    (lambda () (print (vector-map (lambda (col) (vector-map (lambda (x) (newtons-method-paint-by-iteration FUNCTION x ROOTS MAX-ITR 0)) col)) vector))))
+(write-to-file 
+    (vector-map (lambda (col) (vector-map (lambda (x) (newtons-method-paint-by-iteration FUNCTION DERIV x ROOTS MAX-ITR 0)) col)) vector)
+    "out.txt" #:exists 'replace
+)
     ; (vector-map (vector-map (lambda (x) (newtons-method-paint-by-iteration FUNCTION x ROOTS MAX-ITR 0)) x) vector)
 ; 
 ; (display (make-complex-plane vector XMIN YMIN (find-step XMIN XMAX RESOLUTION-X) (find-step YMIN YMAX RESOLUTION-YXMAX
