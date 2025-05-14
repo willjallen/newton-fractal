@@ -2,11 +2,13 @@ from hashlib import new
 import sys, random, math
 import png
 
-size = width, height = 15360, 8640
+size = width, height = 1080, 1920
 
+preset_colors = [(104, 187, 227), (14, 134, 212), (5, 92, 157), (0, 48, 96), (229, 221, 200), (219, 31, 72) ]
 
 def random_color():
-    return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) 
+    return random.choice(preset_colors)
+    # return (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)) 
 
 max_itr = 100
 
@@ -43,7 +45,7 @@ def reader(filename):
                 return
                 
 
-r = reader('renders/[z^3-1]-16k-100itr.txt')
+r = reader('out.txt')
 
 
 arr = []
